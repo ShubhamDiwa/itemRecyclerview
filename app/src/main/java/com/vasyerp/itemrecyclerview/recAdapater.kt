@@ -15,7 +15,7 @@ class recAdapater(
     var context: Context, var List: ArrayList<PriceDto>, var listner: SendData
 ) : RecyclerView.Adapter<recAdapater.RecViewHolder>() {
 
-    var valChange: Boolean = false
+//    var valChange: Boolean = false
 
     class RecViewHolder(Itemview: View) : RecyclerView.ViewHolder(Itemview) {
 
@@ -49,19 +49,21 @@ class recAdapater(
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                valChange = true
-                if (holder.Qt.isFocused && valChange) {
+
                     if (!p0.isNullOrEmpty()) {
-                        updateTotalPrice(item, holder)
                         listner.onQuantityChanged(holder.adapterPosition, p0.toString().toInt())
+//                        updateTotalPrice(item, holder)
                     }
-
-                }
-
-
             }
 
             override fun afterTextChanged(p0: Editable?) {
+                var price=holder.pp.text.toString()
+                if (!p0.isNullOrEmpty()){
+                    var qt=p0.toString().toInt()
+                    netPrice(qt,price,holder)
+                }
+
+
             }
         })
 
@@ -70,40 +72,59 @@ class recAdapater(
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                valChange = true
-                if (holder.pp.isFocused && valChange) {
-                    if (!p0.isNullOrEmpty()) {
 
+                    if (!p0.isNullOrEmpty()) {
+                        listner.onPriceChanged(holder.adapterPosition,p0.toString().toDouble())
+//                        updateTotalPrice(item,holder)
                     }
-                }
             }
 
             override fun afterTextChanged(p0: Editable?) {
+
+                var qt=holder.Qt.text.toString().toInt()
+                if (!p0.toString().isNullOrEmpty()){
+                    var price=p0.toString()
+                    netPrice(qt,price,holder)
+
+                }
+
+
+
+
+
             }
         })
 
-        fun updateList(newPriceList: List<PriceDto>) {
-            List.clear()
-            List.addAll(newPriceList)/*
-                        notifyDataSetChanged()
-            */
-        }
+
     }
+
+    private fun netPrice(qt: Int, price: String, holder: recAdapater.RecViewHolder) {
+        var netSum= qt.toInt() * price.toDouble()
+        listner.sendTotal(holder.adapterPosition,netSum)
+        holder.tp.setText(netSum.toString())
+
+
+    }
+
 
     private fun updateTotalPrice(item: PriceDto, holder: RecViewHolder) {
         var net = (item.quantity * item.price)
-        List[holder.adapterPosition].net = net
+//        List[holder.adapterPosition].net = net // yaha pe humne net value ka position bhej aur update kr dia
         holder.tp.setText(net.toString())
+//        listner.sendTotal(holder.adapterPosition,net)
+
     }
+
 
     interface SendData {
         fun onQuantityChanged(position: Int, quantity: Int)
         fun onPriceChanged(position: Int, price: Double)
+        fun sendTotal(position: Int,total:Double)
 
     }
-
-    fun getLatestList(): List<PriceDto> {
-        return List
-    }
+//    fun getLatestList(): List<PriceDto> {
+//        return List
+//    }
+//
 
 }
