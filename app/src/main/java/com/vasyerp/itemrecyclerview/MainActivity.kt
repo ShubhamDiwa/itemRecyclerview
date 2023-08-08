@@ -9,6 +9,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: recAdapater
     val priceList = ArrayList<PriceDto>()
+    val updatePriceList = ArrayList<PriceDto>()
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -54,28 +55,26 @@ class MainActivity : AppCompatActivity() {
         priceList.add(PriceDto("balaji wafers", 10.0, 2))
         priceList.add(PriceDto("kitkat", 20.0, 4))
         priceList.add(PriceDto("Five star", 5.0, 6))
-        adapter = recAdapater(this,priceList, object : recAdapater.SendData {
+
+
+
+        adapter = recAdapater(this, priceList, object : recAdapater.SendData {
 
             override fun onQuantityChanged(position: Int, quantity: Int) {
                 priceList[position].quantity = quantity
                 Log.e("TAG", "onQuantityChanged:$quantity ")
-                adapter.updatePriceList(priceList)
+
                 netSum()
             }
 
             override fun onPriceChanged(position: Int, price: Double) {
                 priceList[position].price = price
-                Log.e("TAG", "onPriceChanged:$price ")
-                adapter.updatePriceList(priceList)
-            }
-
-            override fun onListUpdated() {
                 netSum()
-
+                Log.e("TAG", "onPriceChanged:$price ")
             }
+
         })
 
-//        netSum()
 
         binding.Mainrec.adapter = adapter
         adapter.notifyDataSetChanged()
@@ -88,35 +87,15 @@ class MainActivity : AppCompatActivity() {
 //            Log.e("TAG", "netSum:${itp.net} ", )
 //        }
         var sum: Double = 0.0
-        for (i in 0..priceList.size - 1) {
-            sum = sum + (priceList[i].net).toString().toDouble()
+        var adapterList = adapter.getLatestList()
+        for (i in 0..adapterList.size - 1) {
+            sum = sum + (adapterList[i].net).toString().toDouble()
             Log.e("TAG", "netSum==:$sum ")
         }
         var s: String = sum.toString()
         binding.tvNet.setText(s)
 
-//                var sum: Double = 0.0
-//                for (i in priceList) {
-//                    sum += i.net!!.toDouble()
-//                    Log.e("HHH", "netSum:$sum ", )
-//                }
-//                var s: String = sum.toString()
-//                binding.tvNet.setText(s)
-
     }
 
-
-    /*
-        override fun onQuantityChanged(position: Int, quantity: Int*/
-    /*, price: Double*//*
-) {
-
-        Log.e("TAg", "onQuantityChanged==quant:${item.quantity} ")
-        //item.price = price
-        Log.e("TAg", "onQuantityChanged==price:${item.price} ")
-//        netSum()
-
-    }
-*/
 
 }

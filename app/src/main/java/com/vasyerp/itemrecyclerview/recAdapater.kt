@@ -11,11 +11,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 
-class recAdapater(var context: Context,
-    var List: ArrayList<PriceDto>,
-    var listner: SendData
-) :
-    RecyclerView.Adapter<recAdapater.RecViewHolder>() {
+class recAdapater(
+    var context: Context, var List: ArrayList<PriceDto>, var listner: SendData
+) : RecyclerView.Adapter<recAdapater.RecViewHolder>() {
+
+    var valChange: Boolean = false
 
     class RecViewHolder(Itemview: View) : RecyclerView.ViewHolder(Itemview) {
 
@@ -27,8 +27,7 @@ class recAdapater(var context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_layout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
         return RecViewHolder(view)
     }
 
@@ -37,8 +36,7 @@ class recAdapater(var context: Context,
     }
 
     override fun onBindViewHolder(
-        holder: RecViewHolder,
-        position: Int
+        holder: RecViewHolder, position: Int
     ) {
         val item = List[position]
         holder.Qt.setText(item.quantity.toString())
@@ -51,53 +49,16 @@ class recAdapater(var context: Context,
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                if (!p0.isNullOrEmpty()) {
-
-                    listner.onQuantityChanged(holder.adapterPosition, p0.toString().toInt())
-                    updateTotalPrice(item, holder)
-
-
-/*
-                    val quantityStr = p0.toString()
-                    if (quantityStr.isNotEmpty()) {
-                        val quantity = quantityStr.toInt()
-                        item.quantity = quantity
+                valChange = true
+                if (holder.Qt.isFocused && valChange) {
+                    if (!p0.isNullOrEmpty()) {
                         updateTotalPrice(item, holder)
-                        p0.let {
-                            listner.onQuantityChanged(holder.adapterPosition, quantity)
-
-                        }
+                        listner.onQuantityChanged(holder.adapterPosition, p0.toString().toInt())
                     }
-*/
 
-                    /* if (!p0.isNullOrEmpty()) {
-                         val quantityStr = p0.toString()
-                         if (quantityStr.isNotEmpty()) {
-                             val quantity = quantityStr.toInt()
-                             item.quantity = quantity
-                             updateTotalPrice(item, holder)
-                             listner.onQuantityChanged(holder.adapterPosition, quantity*//*, item.price*//*)
-*/
-//                    p0.let {
-//                        listner.onQuantityChanged(
-//                            holder.adapterPosition
-//                        )
-//                    }
-//                } else {
-//                    listner.onQuantityChanged(
-//                        holder.adapterPosition, item.quantity
-//                    )
-
-
-                    /*  val quantityStr = p0.toString()
-                      if (quantityStr.isNotEmpty()) {
-                          val quantity = quantityStr.toInt()
-                          item.quantity = quantity
-                          updateTotalPrice(item, holder)
-                          listner.onQuantityChanged(holder.adapterPosition, quantity, item.price)
-*/
                 }
+
+
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -109,21 +70,11 @@ class recAdapater(var context: Context,
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (!p0.isNullOrEmpty()) {
-                    listner.onPriceChanged(holder.adapterPosition, p0.toString().toDouble())
-                    updateTotalPrice(item, holder)
+                valChange = true
+                if (holder.pp.isFocused && valChange) {
+                    if (!p0.isNullOrEmpty()) {
 
-                    /*
-                    val priceStr = p0.toString()
-                    if (priceStr.isNotEmpty()) {
-                        val price = priceStr.toDouble()
-                        item.price = price
-                        updateTotalPrice(item, holder)
-                        p0.let {
-
-
-                        }
-                    }*/
+                    }
                 }
             }
 
@@ -133,25 +84,26 @@ class recAdapater(var context: Context,
 
         fun updateList(newPriceList: List<PriceDto>) {
             List.clear()
-            List.addAll(newPriceList)
-            notifyDataSetChanged()
-            listner.onListUpdated() // Call the interface method when the list is updated
+            List.addAll(newPriceList)/*
+                        notifyDataSetChanged()
+            */
         }
-    }
-    fun updatePriceList(newPriceList: List<PriceDto>) {
-        List.addAll(newPriceList)
-        notifyDataSetChanged()
     }
 
     private fun updateTotalPrice(item: PriceDto, holder: RecViewHolder) {
-        holder.tp.setText((item.quantity * item.price).toString())
+        var net = (item.quantity * item.price)
+        List[holder.adapterPosition].net = net
+        holder.tp.setText(net.toString())
     }
 
     interface SendData {
         fun onQuantityChanged(position: Int, quantity: Int)
         fun onPriceChanged(position: Int, price: Double)
-        fun onListUpdated()
 
+    }
+
+    fun getLatestList(): List<PriceDto> {
+        return List
     }
 
 }

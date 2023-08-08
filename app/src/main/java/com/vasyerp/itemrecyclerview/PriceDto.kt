@@ -5,6 +5,6 @@ data class PriceDto(
     var price: Double,
     var quantity: Int,
     var net: Double? = price * quantity
-) {
+)
 
-}
+
